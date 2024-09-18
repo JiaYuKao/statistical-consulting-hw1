@@ -1,0 +1,97 @@
+---
+title: "My Report"
+date: today
+author: JIA-YU,KAO
+format:
+ pdf:
+    include-in-header:
+      - text: |
+         \usepackage{setspace,relsize}
+mainfont: "Microsoft JhengHei UI"
+toc: true
+---
+
+# Summary Staistic  
+
+```{r}
+#| output: asis
+library(Hmisc)
+library(palmerpenguins)
+str(penguins)
+latex(describe(penguins), file = "", caption.placement = "top")
+library(table1)
+library(ggplot2)
+plot(penguins)
+#there are relationship between continuous variables 
+#由圖中可以看到連續變數間有線性關係
+```
+
+
+# Missing Values
+
+```{r}
+#| output: asis
+library(Hmisc)
+library(DataExplorer)
+plot_missing(penguins)
+#The missing values are mostly concentrated in the sex variable.
+#缺失值大多集中在性別
+```
+
+
+# Tables 
+
+```{r}
+#| warning: false
+library(table1)
+library(ggplot2)
+plot(penguins)
+
+
+shapiro.test(penguins$bill_length_mm)
+shapiro.test(penguins$bill_depth_mm)
+shapiro.test(penguins$flipper_length_mm)
+shapiro.test(penguins$body_mass_g)
+#由常態性檢定可以發現四個變數皆拒絕虛無假設，不符合常態分佈，由上面的圖和檢定推斷可能有干擾因子存在
+#From the shapiro test, it can be observed that all four variables reject the null hypothesis, indicating that they do not follow a normal distribution. Based on the plots and test results above, it can be inferred that there might be confounding factors present.
+
+qplot(bill_length_mm,data=penguins,facets = sex~.)
+qplot(bill_depth_mm,data=penguins,facets = sex~.)
+qplot(flipper_length_mm,data=penguins,facets = sex~.)
+qplot(body_mass_g,data=penguins,facets = sex~.)
+#由此四個圖表可以發現男性企鵝在嘴巴長度,嘴巴深度,鰭肢長度和身體重量都比女性企鵝還長/重
+#From these four charts, it can be observed that male penguins have longer bill length, deeper bill depth, longer flipper length, and heavier body weight compared to female penguins.
+
+female <-subset(penguins,sex=="female")
+male<-subset(penguins,sex=="male")
+t.test(female$bill_length_mm,male$bill_length_mm)
+t.test(female$bill_depth_mm,male$bill_depth_mm)
+t.test(female$flipper_length_mm,male$flipper_length_mm)
+t.test(female$body_mass_g,male$body_mass_g)
+#進行t-test也可以得到相同結果，四個檢定皆拒絕虛無假設，表示男生和女生在四項身體指數平均數有差異
+#Performing a t-test also yields the same results, with all four tests rejecting the null hypothesis, indicating that there are significant differences in the mean values of the four physical indices between male and female penguins.
+
+qplot(bill_length_mm,data=penguins,facets = species~.)
+qplot(bill_depth_mm,data=penguins,facets = species~.)
+qplot(flipper_length_mm,data=penguins,facets = species~.)
+qplot(body_mass_g,data=penguins,facets = species~.)
+#由此四個圖表可以發現不同品種的企鵝在嘴巴長度,嘴巴深度,鰭肢長度和身體重量都有差別
+#From these four charts, it can be observed that different penguin species show differences in bill length, bill depth, flipper length, and body weight.
+
+fit<-aov(bill_length_mm~species,data=penguins)
+summary(fit)
+fit2<-aov(bill_depth_mm~species,data=penguins)
+summary(fit2)
+fit3<-aov(flipper_length_mm~species,data=penguins)
+summary(fit3)
+fit4<-aov(body_mass_g~species,data=penguins)
+summary(fit4)
+#進行anova檢定，發現四個檢定皆拒絕虛無假設
+#Performing ANOVA tests reveals that all four tests reject the null hypothesis, indicating significant differences in the four physical attributes across different penguin species.
+
+#由上述檢定，可以知道性別和品種會影響企鵝的嘴巴長度,嘴巴深度,鰭肢長度和身體重量
+#From the above tests, it can be concluded that both gender and species influence the bill length, bill depth, flipper length, and body weight of penguins.
+```
+
+
+
